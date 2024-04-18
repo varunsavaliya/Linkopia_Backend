@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models";
 import { AppError } from "../helpers";
-import { cookieOptions } from "../../../config";
+import { cookieOptions, getConfig } from "../../../config";
 import { sendEmail } from "../services";
 import { Messages, SystemConstants } from "../constants";
 
@@ -40,7 +40,9 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({
       success: true,
       message: Messages.User.Success.Registration,
-      data: user,
+      data: {
+        token,
+      },
     });
   } catch (error: any) {
     return next(new AppError(error.message, 500));
@@ -69,7 +71,9 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({
       success: true,
       message: Messages.User.Success.Login,
-      data: user,
+      data: {
+        token,
+      },
     });
   } catch (error: any) {
     return next(new AppError(error.message, 500));
@@ -110,6 +114,7 @@ const forgotPassword = async (
   next: NextFunction
 ) => {
   const { email } = req.body;
+
   if (!email) {
     return next(new AppError(Messages.User.Error.EmailRequired, 400));
   }
@@ -124,7 +129,9 @@ const forgotPassword = async (
 
     await user.save();
 
-    const resetPasswordURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const resetPasswordURL = `${getConfig(
+      "frontendUrl"
+    )}/reset-password/${resetToken}`;
     const subject = "Reset your password";
     const message = `You can reset your password by clicking on this link -> ${resetPasswordURL}`;
 

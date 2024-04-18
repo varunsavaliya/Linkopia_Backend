@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { AppError } from "../helpers";
 import jwt from "jsonwebtoken";
 import { SystemConstants } from "../constants";
+import { getConfig } from "../../../config";
 
 export const isLoggedIn = async (
   req: Request,
@@ -14,7 +15,7 @@ export const isLoggedIn = async (
     return next(new AppError(SystemConstants.NotAuthorized.Token, 400));
   }
 
-  const userDetail = jwt.verify(token, process.env.JWT_SECRET || "");
+  const userDetail = jwt.verify(token, getConfig("jwtSecret"));
   req.body.user = userDetail;
 
   next();

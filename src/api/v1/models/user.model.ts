@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { IUser } from "../interfaces";
 import { UserRole } from "../enums";
+import { getConfig } from "../../../config";
 
 interface IUserMethods extends Document {
   comparePassword: (plainTextPassword: string) => Promise<boolean>;
@@ -77,9 +78,9 @@ userSchema.method("generateJWTToken", async function generateJWTToken() {
       email: this.email,
       role: this.role,
     },
-    process.env.JWT_SECRET || "",
+    getConfig("jwtSecret"),
     {
-      expiresIn: process.env.JWT_EXPIRY,
+      expiresIn: getConfig("jwtExpiry"),
     }
   );
 });

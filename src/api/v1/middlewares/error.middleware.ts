@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { getConfig } from "../../../config";
 import { AppError } from "../helpers";
 
 const errorMiddleware = (
@@ -13,7 +14,7 @@ const errorMiddleware = (
   return res.status(err.statusCode).json({
     success: false,
     message: err.message,
-    stack: err.stack,
+    stack: getConfig("nodeEnv") === "production" ? undefined : err.stack,
   });
 };
 
